@@ -6,12 +6,12 @@ const path = require('path');
 const repoPath = process.cwd();
 
 // Define the start date and the end date
-const startDate = new Date('2018-03-15');
-const endDate = new Date('2018-12-20');
+const startDate = new Date('2024-01-10');
+const endDate = new Date('2024-07-05');
 
 // Create a file to commit
 const fileName = 'fake_history.txt';
-fs.writeFileSync(path.join(repoPath, fileName), 'This is a updated commit history file.\n');
+fs.writeFileSync(path.join(repoPath, fileName), 'This is a fake commit history file.\n');
 
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
@@ -44,11 +44,21 @@ for (let week = 0; week < numWeeks; week++) {
             GIT_AUTHOR_DATE: commitDate.toISOString(),
         };
 
-        // Run git add, commit, and push commands
-        execSync(`git add ${fileName}`, { stdio: 'inherit' });
-        execSync(`git commit -m "${commitMessage}"`, { env: envVars, stdio: 'inherit' });
+        try {
+            // Run git add, commit, and push commands
+            execSync(`git add ${fileName}`, { stdio: 'inherit' });
+            execSync(`git commit -m "${commitMessage}"`, { env: envVars, stdio: 'inherit' });
+        } catch (error) {
+            console.error(`Error committing on date ${commitDate.toISOString().split('T')[0]}: ${error.message}`);
+            console.error(error.stderr?.toString() || error.stdout?.toString());
+        }
     }
 }
 
 // Push the commits to the remote repository
-execSync('git push', { stdio: 'inherit' });
+try {
+    execSync('git push', { stdio: 'inherit' });
+} catch (error) {
+    console.error('Error pushing to remote repository:', error.message);
+    console.error(error.stderr?.toString() || error.stdout?.toString());
+}
